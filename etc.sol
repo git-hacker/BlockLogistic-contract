@@ -1,10 +1,26 @@
 pragma solidity ^0.4.24;
 
-contract ETCContract{
+contract ETC{
+    
+    // create etc order
+    event onCreateETCOrder
+    (
+        uint256 logisticOrderId,//logistic order id
+        address customerAddr,//customer address
+        uint256 eth //insurance money 
+    );
+    
+    // excute etc once
+    event onExcuteETCOnce
+    (
+        uint256 logisticOrderId,//logistic order id
+        address etcAddr,//etc address
+        uint256 eth //etc money once
+    );
 
      /** contract total money */
     uint256 public pool = 0;
-    address private etcAddr = 0x87cfbf13a4de9448339642c8608901ccc99b0e23;
+    address private etcAddr = 0xd0a50a025a06f8231c715432dd690d7d26ca0a84;
     address private admin = msg.sender;
     address public comfirmAddr;
 
@@ -14,29 +30,42 @@ contract ETCContract{
     mapping (uint256 => EtcOrder) public EtcOrders;          // (customerIdCard => etcOrder)  etcOrders
 
     modifier onlyAdmin(address _adminAddr){
-        admin == require(admin == _adminAddr,"must be admin address");
+        require(admin == _adminAddr,"must be admin address");
         _;
     }
 
     modifier onlyConfirmAddr(address _confirmAddr){
-        admin == require(comfirmAddr == _confirmAddr,"must be comfirm address");
+       require(comfirmAddr == _confirmAddr,"must be confirm address");
+        _;
+    }
+    
+    modifier onlyETCAddr(address _etcAddr){
+       require(etcAddr == _etcAddr,"must be etc address");
         _;
     }
 
-    function core(uint256 logisticOrderId) public payable{
+    function core(uint256 logisticOrderId,address customerAddr) 
+    onlyConfirmAddr(msg.sender)
+    public payable{
         pool = pool + msg.value;
-        EtcOrders[logisticOrderId] = EtcOrder(msg.sender,msg.value);
+        EtcOrders[logisticOrderId] = EtcOrder(customerAddr,msg.value);
+        emit onCreateETCOrder(logisticOrderId,customerAddr,msg.value);
     }
 
-    function setConfirmAddr(address _confirmAddr)
-    onlyAdmin(msg.sender)
-    {
+    function setConfirmAddr(address _confirmAddr) 
+    onlyAdmin(msg.sender) 
+    public {
         comfirmAddr = _confirmAddr;
     }
 
-    function reduce(uint256 logisticOrderId) public payable{
+    function reduce(uint256 logisticOrderId) 
+    onlyETCAddr(msg.sender)
+    public payable{
+        require(EtcOrders[logisticOrderId].eth > 0,"order id must be exists");
         EtcOrders[logisticOrderId].eth = EtcOrders[logisticOrderId].eth - 10 ** 17;
         etcAddr.transfer(10 ** 17);
+        pool = pool - 10 ** 17;
+        emit onExcuteETCOnce(logisticOrderId,EtcOrders[logisticOrderId].customerAddr,10 ** 17);
     }
 
     function confirm(uint256 logisticOrderId) 
@@ -44,7 +73,8 @@ contract ETCContract{
     public{
         if (EtcOrders[logisticOrderId].eth > 0) {
             pool = pool - EtcOrders[logisticOrderId].eth;
-            msg.sender.transfer(EtcOrders[logisticOrderId].eth);
+            address customerAddr = EtcOrders[logisticOrderId].customerAddr;
+            customerAddr.transfer(EtcOrders[logisticOrderId].eth);
         }
     }
 
