@@ -25,7 +25,7 @@ contract LogisticEvents {
     );
 
     event onConfirmOrder(
-        uint256 orderId,      // order id
+        uint256 orderId      // order id
     );
 }
 
@@ -37,8 +37,8 @@ contract Logistic1 is LogisticEvents{
     /**team 5% when someone win*/
 // uint256 public com = 5;
 
-    InsuranceInterface constant private Insurance = InsuranceInterface(0x04077f6da3601113821e74146495554e42aff939);
-    ETCInterface constant private ETC = ETCInterface(0x43a1aedafa1cecc0c6c73df2be97f161a3bcae20);
+    InsuranceInterface constant private Insurance = InsuranceInterface(0x34ed2237f245d3823348c83aeb2c12895cdf302c);
+    ETCInterface constant private ETC = ETCInterface(0x43049c7fb27235971c8953641b4a7ce21553ad6a);
 
     //****************
     // User DATA
@@ -75,9 +75,6 @@ contract Logistic1 is LogisticEvents{
         unitEtcPrice = 5 * (10 ** 14);// 0.0005eth
 
         currentOrderId = 0;// the order id is 0 when the contract started
-
-        ETC.core.value(participantFees[currentOrderId].etcFee)(currentOrderId);
-
 	}
 
      /**
@@ -89,7 +86,7 @@ contract Logistic1 is LogisticEvents{
         _;
     }
 
-     modifier onlyCustomer(address _customerAddr,_orderId){
+     modifier onlyCustomer(address _customerAddr,uint256 _orderId){
         require(orders[_orderId].custumerAddr == _customerAddr,"must be confirm by the customer who owned the order");
         _;
      }
@@ -133,7 +130,7 @@ contract Logistic1 is LogisticEvents{
         driverAddr.transfer(driverFee);
         pool = pool - driverFee;
         emit LogisticEvents.onConfirmOrder(_orderId);
-        ETC.confirm(_orderId);
+      //  ETC.confirm(_orderId);
 
         users[orders[_orderId].driverIdCard].scoreCredit++;
     }
@@ -155,6 +152,7 @@ interface InsuranceInterface {
 }
 interface ETCInterface {
     function core(uint256 logisticOrderId)  external payable;
+    function confirm(uint256 logisticOrderId) external;
 }
 
 
