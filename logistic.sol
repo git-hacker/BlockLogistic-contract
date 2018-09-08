@@ -37,8 +37,8 @@ contract Logistic1 is LogisticEvents{
     /**team 5% when someone win*/
 // uint256 public com = 5;
 
-    InsuranceInterface constant private Insurance = InsuranceInterface(0xcff4ac733f32b915473f13bcf7fef2c0c2f8cb07);
-    ETCInterface constant private ETC = ETCInterface(0xb5b7a83463daae0322783adae959a55ae501810f);
+    InsuranceInterface constant private Insurance = InsuranceInterface(0x43049c7fb27235971c8953641b4a7ce21553ad6a);
+    ETCInterface constant private ETC = ETCInterface(0xa06466247b52cbe8f3e7bfae823ab729b51a7aaf);
 
     //****************
     // User DATA
@@ -90,6 +90,12 @@ contract Logistic1 is LogisticEvents{
         require(orders[_orderId].custumerAddr == _customerAddr,"must be confirm by the customer who owned the order");
         _;
      }
+     
+     modifier verifyOrder(uint256 _orderId){
+        require(orders[_orderId].id > 0,"order must be exist");
+        require(orders[_orderId].status == 1,"order must be pay status");
+        _;
+     }
 
 
     function put() public payable{
@@ -104,7 +110,7 @@ contract Logistic1 is LogisticEvents{
         pool = pool + msg.value;
         currentOrderId = currentOrderId +1;
         address driverAddr = users[_driverIdCard].addr;
-        orders[currentOrderId] = LogisticDatasets.Order(currentOrderId,msg.value,_idCard,msg.sender,_driverIdCard,driverAddr,_distance,_goods,"");
+        orders[currentOrderId] = LogisticDatasets.Order(currentOrderId,msg.value,_idCard,msg.sender,_driverIdCard,driverAddr,_distance,_goods,1);
 
         emit LogisticEvents.onCreateOrder(currentOrderId,msg.value,_idCard,msg.sender,_driverIdCard,driverAddr);
 
@@ -122,17 +128,36 @@ contract Logistic1 is LogisticEvents{
 
     }
 
+    /**unconfirm ,transfer to driver*/
     function confirm(uint256 _orderId)
     onlyCustomer(msg.sender,_orderId)
-    public payable{
+    verifyOrder(_orderId)
+    public{
         address driverAddr = orders[_orderId].driverAddr;
         uint256 driverFee = participantFees[_orderId].driverFee;
         driverAddr.transfer(driverFee);
         pool = pool - driverFee;
+        orders[_orderId].status = 2;
         emit LogisticEvents.onConfirmOrder(_orderId);
       //  ETC.confirm(_orderId);
 
         users[orders[_orderId].driverIdCard].scoreCredit++;
+    }
+    
+    /**unconfirm ,transfer back to customer*/
+     function unconfirm(uint256 _orderId)
+    onlyCustomer(msg.sender,_orderId)
+    verifyOrder(_orderId)
+    public{
+        address custumerAddr = orders[_orderId].custumerAddr;
+        uint256 driverFee = participantFees[_orderId].driverFee;
+        custumerAddr.transfer(driverFee);
+        pool = pool - driverFee;
+        orders[_orderId].status = 3;
+        emit LogisticEvents.onConfirmOrder(_orderId);
+      //  ETC.confirm(_orderId);
+
+        users[orders[_orderId].driverIdCard].scoreCredit--;
     }
 
     function sign(string name, uint256 idCard,uint256 userType) public{
@@ -177,7 +202,7 @@ library LogisticDatasets {
         address driverAddr;   // driver address
         uint256 distance;       // distance
         string goods;     // goods
-        string extra;    // extra infomation
+        uint256 status;   //order status,1=>payed;2=>confirmed;3=>unconfirmed
     }
 
     struct ParticipantFees{
