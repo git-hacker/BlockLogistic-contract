@@ -37,8 +37,8 @@ contract Logistic1 is LogisticEvents{
     /**team 5% when someone win*/
 // uint256 public com = 5;
 
-    InsuranceInterface constant private Insurance = InsuranceInterface(0x34ed2237f245d3823348c83aeb2c12895cdf302c);
-    ETCInterface constant private ETC = ETCInterface(0x43049c7fb27235971c8953641b4a7ce21553ad6a);
+    InsuranceInterface constant private Insurance = InsuranceInterface(0xcff4ac733f32b915473f13bcf7fef2c0c2f8cb07);
+    ETCInterface constant private ETC = ETCInterface(0xb5b7a83463daae0322783adae959a55ae501810f);
 
     //****************
     // User DATA
@@ -117,12 +117,12 @@ contract Logistic1 is LogisticEvents{
         }
 
         Insurance.core.value(participantFees[currentOrderId].insuranceFee)(currentOrderId,_idCard,msg.sender,_distance,_goods,_estimatePrice);
-        ETC.core.value(participantFees[currentOrderId].etcFee)(currentOrderId);
+        ETC.core.value(participantFees[currentOrderId].etcFee)(currentOrderId,msg.sender);
         pool = pool - participantFees[currentOrderId].insuranceFee - participantFees[currentOrderId].etcFee;
 
     }
 
-    function confirm(uint256 _orderId) 
+    function confirm(uint256 _orderId)
     onlyCustomer(msg.sender,_orderId)
     public payable{
         address driverAddr = orders[_orderId].driverAddr;
@@ -151,7 +151,7 @@ interface InsuranceInterface {
     function core(uint256 logisticOrderId,uint256 customerIdCard,address customerAddr,uint256 distance,string goods,uint256 estimatePrice)  external payable;
 }
 interface ETCInterface {
-    function core(uint256 logisticOrderId)  external payable;
+    function core(uint256 logisticOrderId,address customerAddr)  external payable;
     function confirm(uint256 logisticOrderId) external;
 }
 

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract Insurance1{
-    
+
         // create order
     event onCreateOrder
     (
@@ -11,10 +11,10 @@ contract Insurance1{
         address customerAddr,//customer address
         uint256 distance,
         string  goods,
-        uint256 eth, //insurance money 
+        uint256 eth, //insurance money
         uint256 payIfFail // pay if the goods has accident
     );
-    
+
    // compensate order
     event onCompensateOrder
     (
@@ -25,12 +25,12 @@ contract Insurance1{
     );
 
     /** contract total money must be greater than  100*(insurance money) */
-    uint256 public pool = 10 ** 25; 
+    uint256 public pool = 10 ** 25;
     uint256 currentOrderId = 0;
     address private admin = 0x62fdde3f7877c98e476ccaca737abf3b86ab155a;
 
     //****************
-    // Insurance Order 
+    // Insurance Order
     //****************
     mapping (uint256 => Order) public orders;          // (orderId => order)  orders
 
@@ -43,17 +43,17 @@ contract Insurance1{
     }
 
      /**
-     * if pool is low than 100 * (insurance money) 
+     * if pool is low than 100 * (insurance money)
      */
     modifier onlyCustomerAddr(address customAddr,uint256 orderId) {
         require(orders[orderId].customerAddr == customAddr, "sorry only customer address");
         _;
     }
 
-    function core(uint256 logisticOrderId,uint256 customerIdCard,address customerAddr,uint256 distance,string goods,uint256 estimatePrice) 
+    function core(uint256 logisticOrderId,uint256 customerIdCard,address customerAddr,uint256 distance,string goods,uint256 estimatePrice)
     isLowThanDeposit(estimatePrice)
     public payable{
-        
+
         currentOrderId = currentOrderId + 1;
         uint256 payIfFail = estimatePrice * 60 / 100; // 60%
         orders[currentOrderId]=Order(currentOrderId,logisticOrderId,customerIdCard,customerAddr,distance,goods,msg.value,payIfFail);
@@ -65,16 +65,16 @@ contract Insurance1{
      /**
      *  compensate customer payIfFail.
      */
-    function compensate(uint256 orderId) 
+    function compensate(uint256 orderId)
     onlyCustomerAddr(msg.sender,orderId)
     public payable{
-        
+
         address customAddr = orders[orderId].customerAddr;
         uint256 payIfFail = orders[orderId].payIfFail;
         customAddr.transfer(payIfFail);
         uint256 logisticOrderId = orders[orderId].logisticOrderId;
         address customerAddr = orders[orderId].customerAddr;
-      
+
         emit onCompensateOrder(orderId,logisticOrderId,customerAddr,payIfFail);
 
     }
@@ -87,7 +87,7 @@ contract Insurance1{
         address customerAddr;//customer address
         uint256 distance;
         string  goods;
-        uint256 eth; //insurance money 
+        uint256 eth; //insurance money
         uint256 payIfFail; // pay if the goods has accident
     }
 

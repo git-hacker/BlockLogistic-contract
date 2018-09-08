@@ -1,15 +1,15 @@
 pragma solidity ^0.4.24;
 
 contract ETC{
-    
+
     // create etc order
     event onCreateETCOrder
     (
         uint256 logisticOrderId,//logistic order id
         address customerAddr,//customer address
-        uint256 eth //insurance money 
+        uint256 eth //insurance money
     );
-    
+
     // excute etc once
     event onExcuteETCOnce
     (
@@ -38,13 +38,13 @@ contract ETC{
        require(comfirmAddr == _confirmAddr,"must be confirm address");
         _;
     }
-    
+
     modifier onlyETCAddr(address _etcAddr){
        require(etcAddr == _etcAddr,"must be etc address");
         _;
     }
 
-    function core(uint256 logisticOrderId,address customerAddr) 
+    function core(uint256 logisticOrderId,address customerAddr)
     onlyConfirmAddr(msg.sender)
     public payable{
         pool = pool + msg.value;
@@ -52,13 +52,13 @@ contract ETC{
         emit onCreateETCOrder(logisticOrderId,customerAddr,msg.value);
     }
 
-    function setConfirmAddr(address _confirmAddr) 
-    onlyAdmin(msg.sender) 
+    function setConfirmAddr(address _confirmAddr)
+    onlyAdmin(msg.sender)
     public {
         comfirmAddr = _confirmAddr;
     }
 
-    function reduce(uint256 logisticOrderId) 
+    function reduce(uint256 logisticOrderId)
     onlyETCAddr(msg.sender)
     public payable{
         require(EtcOrders[logisticOrderId].eth > 0,"order id must be exists");
@@ -68,7 +68,7 @@ contract ETC{
         emit onExcuteETCOnce(logisticOrderId,EtcOrders[logisticOrderId].customerAddr,10 ** 17);
     }
 
-    function confirm(uint256 logisticOrderId) 
+    function confirm(uint256 logisticOrderId)
     onlyConfirmAddr(msg.sender)
     public{
         if (EtcOrders[logisticOrderId].eth > 0) {
