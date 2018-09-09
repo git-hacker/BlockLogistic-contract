@@ -67,7 +67,7 @@ contract Insurance1{
      */
     function compensate(uint256 orderId)
     onlyCustomerAddr(msg.sender,orderId)
-    public payable{
+    public{
 
         address customAddr = orders[orderId].customerAddr;
         uint256 payIfFail = orders[orderId].payIfFail;
