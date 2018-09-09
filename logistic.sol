@@ -37,8 +37,8 @@ contract Logistic1 is LogisticEvents{
     /**team 5% when someone win*/
 // uint256 public com = 5;
 
-    InsuranceInterface constant private Insurance = InsuranceInterface(0x43049c7fb27235971c8953641b4a7ce21553ad6a);
-    ETCInterface constant private ETC = ETCInterface(0xa06466247b52cbe8f3e7bfae823ab729b51a7aaf);
+    InsuranceInterface constant private Insurance = InsuranceInterface(0x0971b5d216af52c411c9016bbc63665b4e6f2542);
+    ETCInterface constant private ETC = ETCInterface(0x9876e235a87f520c827317a8987c9e1fde804485);
 
     //****************
     // User DATA
@@ -139,7 +139,7 @@ contract Logistic1 is LogisticEvents{
         pool = pool - driverFee;
         orders[_orderId].status = 2;
         emit LogisticEvents.onConfirmOrder(_orderId);
-      //  ETC.confirm(_orderId);
+        ETC.confirm(_orderId);
 
         users[orders[_orderId].driverIdCard].scoreCredit++;
     }
@@ -155,7 +155,7 @@ contract Logistic1 is LogisticEvents{
         pool = pool - driverFee;
         orders[_orderId].status = 3;
         emit LogisticEvents.onConfirmOrder(_orderId);
-      //  ETC.confirm(_orderId);
+        ETC.confirm(_orderId);
 
         users[orders[_orderId].driverIdCard].scoreCredit--;
     }
