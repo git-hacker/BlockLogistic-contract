@@ -1,0 +1,39 @@
+/test.sol:8:29: Warning: This looks like an address but has an invalid checksum. If this is not used as an address, please prepend '00'. Correct checksummed address: '0x62FDDe3f7877c98E476CCaCa737ABf3B86ab155A'. For more information please see https://solidity.readthedocs.io/en/develop/types.html#address-literals
+    address private admin = 0x62fdde3f7877c98e476ccaca737abf3b86ab155a;
+               
+
+               transact to Insurance1.core errored: Error encoding arguments: Error: invalid number value (arg="", type="number", value=510625198711252350) 
+
+
+
+
+
+
+1,"510625198711252375",0x9b4ab7f5964663b0989cadaa9da5e05017b6a234,2000,"test",1000000000000000000
+        emit onCompensateOrder(orderId,logisticOrderId,customerIdCard,customerAddr,distance,goods,eth,payIfFail);
+
+30ETH
+
+估值是200ETH * %2=4ETH
+2000,"510625200811252756","510625200911252758","computer",200000000000000000000
+
+"glowd","510625200811252756",1
+"helen","510625200911252758",2
+
+
+etcFee: 10000000000000000000 uint256
+driverFee: 20000000000000000000 uint256
+insuranceFee: 5000000000000000000
+10000000000000000000 
+20000000000000000000 20ETH
+ 5000000000000000000
+23000000000000000000
+
+
+
+
+browser/test.sol:85:121: CompilerError: Stack too deep, try removing local variables.
+
+
+        (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXnameFromDapp.value(msg.value)(msg.sender, _name, _affCode, _all);
+

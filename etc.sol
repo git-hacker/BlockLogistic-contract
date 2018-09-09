@@ -18,6 +18,14 @@ contract ETC{
         uint256 eth //etc money once
     );
 
+    // excute etc confirm
+    event onConfirm
+    (
+        uint256 logisticOrderId,//logistic order id
+        address customerAddr,//customer address
+        uint256 eth //leave money
+    );
+
      /** contract total money */
     uint256 public pool = 0;
     address private etcAddr = 0xd0a50a025a06f8231c715432dd690d7d26ca0a84;
@@ -75,6 +83,7 @@ contract ETC{
             pool = pool - EtcOrders[logisticOrderId].eth;
             address customerAddr = EtcOrders[logisticOrderId].customerAddr;
             customerAddr.transfer(EtcOrders[logisticOrderId].eth);
+            emit onConfirm(logisticOrderId,customerAddr,EtcOrders[logisticOrderId].eth);
         }
     }
 
